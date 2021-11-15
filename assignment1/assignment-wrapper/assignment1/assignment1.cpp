@@ -69,10 +69,13 @@ GLuint numspherevertices;
 /* Global instances of our objects */
 Sphere aSphere;
 Cube aCube;
-Cylinder aCylinder;
+Cylinder bigCylinder(glm::vec3(0.0f, 0.0f, 0.0f));
+Cylinder smallCylinder(glm::vec3(1.0f, 0.0f, 0.0f));
+Cylinder tube(glm::vec3(1.0f, 1.0f, 1.0f));
 
 using namespace std;
 using namespace glm;
+
 
 /*
 This function is called before entering the main rendering loop.
@@ -137,7 +140,9 @@ void init(GLWrapper* glw)
 	/* create our sphere and cube objects */
 	aSphere.makeSphere(numlats, numlongs);
 	aCube.makeCube();
-	aCylinder.makeCylinder();
+	bigCylinder.makeCylinder();
+	smallCylinder.makeCylinder();
+	tube.makeCylinder();
 }
 
 /* Called to update the display. Note that this function is called in the event loop in the wrapper
@@ -252,7 +257,7 @@ void display()
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
-		aCylinder.drawCylinder(drawmode);
+		bigCylinder.drawCylinder(drawmode);
 	}
 	model.pop();
 
@@ -273,7 +278,7 @@ void display()
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
-		aCylinder.drawCylinder(drawmode);
+		smallCylinder.drawCylinder(drawmode);
 	}
 	model.pop();
 
@@ -294,7 +299,7 @@ void display()
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
-		aCylinder.drawCylinder(drawmode);
+		tube.drawCylinder(drawmode);
 	}
 	model.pop();
 
@@ -387,13 +392,13 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		}
 	}
 	if (key == 'C') {
-		if (true) {
-			rotation_lift += 5.0f;
+		if (rotation_lift > -10.0f) {
+			rotation_lift -= 2.5f;
 		}
 	}
 	if (key == 'V') {
-		if (true) {
-			rotation_lift -= 5.0f;
+		if (rotation_lift < 2.5f) {
+			rotation_lift += 2.5f;
 		}
 	}
 
@@ -406,6 +411,7 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	cout << "light x" << light_x << endl;
 	cout << "light y" << light_y << endl;
 	cout << "light z" << light_z << endl;
+	cout << "rotation lift" << rotation_lift << endl;
 
 	if (key == 'M' && action != GLFW_PRESS)
 	{
