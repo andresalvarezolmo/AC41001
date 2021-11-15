@@ -61,6 +61,9 @@ GLuint modelID, viewID, projectionID, lightposID, normalmatrixID;
 GLuint colourmodeID, emitmodeID, attenuationmodeID;
 
 GLfloat aspect_ratio;		/* Aspect ratio of the window defined in the reshape callback*/
+
+GLfloat rotation_angle;	//rotation	
+GLfloat rotation_lift;	//rotation	
 GLuint numspherevertices;
 
 /* Global instances of our objects */
@@ -86,6 +89,8 @@ void init(GLWrapper* glw)
 
 
 	/* Set the object transformation controls to their initial values */
+	rotation_angle = 0.0f;
+	rotation_lift = 0.0f;
 	speed = 0.05f;
 	x = 0.05f;
 	y = 0;
@@ -228,14 +233,14 @@ void display()
 		/* Draw our cube*/
 		aCube.drawCube(drawmode);
 	}
-	model.pop();	
-	
+	model.pop();
+
 	// This block of code draws the bigger disk
 	model.push(model.top());
 	{
 		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(x-0.08, y, z+0.15));
-		model.top() = rotate(model.top(), radians(90.0f), vec3(1,0,0));//scale equally in all axis
+		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.15));
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
 		model.top() = scale(model.top(), vec3(0.59f, 0.04f, 0.59f));//scale equally in all axis
 		//model.top() = scale(model.top(), vec3(model_scale/1.7, model_scale / 25, model_scale/1.7));//scale equally in all axis
 
@@ -292,13 +297,21 @@ void display()
 		aCylinder.drawCylinder(drawmode);
 	}
 	model.pop();
-		
+
 	// This block of code draws the stick
 	model.push(model.top());
 	{
 		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(x+0.6, y, z+0.29));
-		model.top() = scale(model.top(), vec3(0.125f, 2.5f, 0.33f));//scale equally in all axis
+		model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.29f));
+
+
+		//for stick rotation
+		model.top() = rotate(model.top(), radians(rotation_angle), vec3(0, 0, 1));
+		//Rotate up and down
+		model.top() = rotate(model.top(), radians(rotation_lift), vec3(1, 0, 0));
+		model.top() = translate(model.top(), vec3(0, -0.6f, 0));
+
+		model.top() = scale(model.top(), vec3(0.125f, 2.5f, 0.1f));//scale equally in all axis
 
 		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
@@ -345,12 +358,12 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'Y') angle_inc_z += speed;
 	if (key == 'A') model_scale -= speed / 0.5f;
 	if (key == 'S') model_scale += speed / 0.5f;
-	if (key == 'Z') x -= speed;
-	if (key == 'X') x += speed;
-	if (key == 'C') y -= speed;
-	if (key == 'V') y += speed;
-	if (key == 'B') z -= speed;
-	if (key == 'N') z += speed;
+	//if (key == 'Z') x -= speed;
+	//if (key == 'X') x += speed;
+	//if (key == 'C') y -= speed;
+	//if (key == 'V') y += speed;
+	//if (key == 'B') z -= speed;
+	//if (key == 'N') z += speed;
 	if (key == '1') light_x -= speed;
 	if (key == '2') light_x += speed;
 	if (key == '3') light_y -= speed;
@@ -363,13 +376,33 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;
+	if (key == 'N') {
+		if (rotation_angle < 0) {
+			rotation_angle += 5.0f;
+		}
+	}
+	if (key == 'B') {
+		if (rotation_angle > -30) {
+			rotation_angle -= 5.0f;
+		}
+	}
+	if (key == 'C') {
+		if (true) {
+			rotation_lift += 5.0f;
+		}
+	}
+	if (key == 'V') {
+		if (true) {
+			rotation_lift -= 5.0f;
+		}
+	}
 
 
 	cout << "view x" << vx << endl;
 	cout << "view y" << vz << endl;
-	cout << "view z" << vy << endl;	
-	
-	
+	cout << "view z" << vy << endl;
+
+
 	cout << "light x" << light_x << endl;
 	cout << "light y" << light_y << endl;
 	cout << "light z" << light_z << endl;
