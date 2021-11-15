@@ -1,0 +1,6 @@
+view x0
+view y4
+view z0
+light x0.75
+light y0.45
+light z0.65

@@ -99,7 +99,7 @@ void init(GLWrapper* glw)
 	y = 0;
 	z = 0;
 	vx = 0; vx = 0, vz = 4.f;
-	light_x = 0.65f; light_y = 0.45f; light_z = 1.15f;
+	light_x = 0.75f; light_y = 0.45f; light_z = 0.65f;
 	angle_x = angle_y = angle_z = 0;
 	angle_inc_x = angle_inc_y = angle_inc_z = 0;
 	model_scale = 1.f;
@@ -174,7 +174,7 @@ void display()
 
 	// Camera matrix
 	mat4 view = lookAt(
-		vec3(0, 0, 4), // Camera is at (0,0,4), in World Space
+		vec3(0, -3, 2), // Camera is at (0,0,4), in World Space
 		vec3(0, 0, 0), // and looks at the origin
 		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
@@ -363,12 +363,12 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'Y') angle_inc_z += speed;
 	if (key == 'A') model_scale -= speed / 0.5f;
 	if (key == 'S') model_scale += speed / 0.5f;
-	//if (key == 'Z') x -= speed;
-	//if (key == 'X') x += speed;
-	//if (key == 'C') y -= speed;
-	//if (key == 'V') y += speed;
-	//if (key == 'B') z -= speed;
-	//if (key == 'N') z += speed;
+	if (key == 'Z') x -= speed;
+	if (key == 'X') x += speed;
+	if (key == 'C') y -= speed;
+	if (key == 'V') y += speed;
+	if (key == 'B') z -= speed;
+	if (key == 'N') z += speed;
 	if (key == '1') light_x -= speed;
 	if (key == '2') light_x += speed;
 	if (key == '3') light_y -= speed;
@@ -381,22 +381,22 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;
-	if (key == 'N') {
+	if (key == 'L') {
 		if (rotation_angle < 0) {
 			rotation_angle += 5.0f;
 		}
 	}
-	if (key == 'B') {
+	if (key == 'K') {
 		if (rotation_angle > -30) {
 			rotation_angle -= 5.0f;
 		}
 	}
-	if (key == 'C') {
+	if (key == 'J') {
 		if (rotation_lift > -10.0f) {
 			rotation_lift -= 2.5f;
 		}
 	}
-	if (key == 'V') {
+	if (key == 'H') {
 		if (rotation_lift < 2.5f) {
 			rotation_lift += 2.5f;
 		}
