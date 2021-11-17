@@ -50,11 +50,16 @@ GLuint attenuationmode;
 /* Position and view globals */
 GLfloat angle_x, angle_inc_x, x, model_scale, z, y, vx, vy, vz;
 GLfloat angle_y, angle_inc_y, angle_z, angle_inc_z;
+
+GLfloat sphere_x, sphere_y, sphere_z;
+
 GLuint drawmode;			// Defines drawing mode of sphere as points, lines or filled polygons
 GLuint numlats, numlongs;	//Define the resolution of the sphere object
 GLfloat speed;				// movement increment
 
-GLfloat light_x, light_y, light_z;
+GLfloat light_x;
+GLfloat light_y;
+GLfloat light_z;
 
 /* Uniforms*/
 GLuint modelID, viewID, projectionID, lightposID, normalmatrixID;
@@ -100,7 +105,6 @@ void init(GLWrapper* glw)
 	z = 0;
 	vx = 0; vx = 0, vz = 4.f;
 	light_x = 0.75f; light_y = 0.45f; light_z = 0.65f;
-	angle_x = angle_y = angle_z = 0;
 	angle_inc_x = angle_inc_y = angle_inc_z = 0;
 	model_scale = 1.f;
 	aspect_ratio = 1.3333f;
@@ -109,6 +113,10 @@ void init(GLWrapper* glw)
 	numlats = 40;		// Number of latitudes in our sphere
 	numlongs = 40;		// Number of longitudes in our sphere
 
+
+	sphere_x = 0.6f;
+	sphere_y = -0.51f;
+	sphere_z = 0.22f;
 	// Generate index (name) for one vertex array object
 	glGenVertexArrays(1, &vao);
 
@@ -246,7 +254,7 @@ void display()
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.15));
 		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.59f, 0.04f, 0.59f));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(0.59f, 0.03f, 0.59f));//scale equally in all axis
 		//model.top() = scale(model.top(), vec3(model_scale/1.7, model_scale / 25, model_scale/1.7));//scale equally in all axis
 
 		// Send the model uniform and normal matrix to the currently bound shader,
@@ -265,9 +273,9 @@ void display()
 	model.push(model.top());
 	{
 		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.18));
+		model.top() = translate(model.top(), vec3(x - 0.08f, y, z + 0.165f));
 		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.2f, 0.04f, 0.2f));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(0.2f, 0.022f, 0.2f));//scale equally in all axis
 		//model.top() = scale(model.top(), vec3(model_scale / 5, model_scale / 25, model_scale / 5));//scale equally in all axis
 
 		// Send the model uniform and normal matrix to the currently bound shader,
@@ -288,7 +296,28 @@ void display()
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.19));
 		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.02f, 0.10f, 0.02f));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(0.02f, 0.06f, 0.02f));//scale equally in all axis
+		//model.top() = scale(model.top(), vec3(model_scale / 50, model_scale / 10, model_scale / 50));//scale equally in all axis
+
+		// Send the model uniform and normal matrix to the currently bound shader,
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+
+		// Recalculate the normal matrix and send to the vertex shader
+		normalmatrix = transpose(inverse(mat3(view * model.top())));
+		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+		/* Draw our cube*/
+		tube.drawCylinder(drawmode);
+	}
+	model.pop();
+
+	// This block of code draws the tube cylinder of the disk
+	model.push(model.top());
+	{
+		// Define the model transformations for the cube
+		model.top() = translate(model.top(), vec3(x + 0.6, y + 0.58, z + 0.16));
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(0.04f, 0.3f, 0.04f));//scale equally in all axis
 		//model.top() = scale(model.top(), vec3(model_scale / 50, model_scale / 10, model_scale / 50));//scale equally in all axis
 
 		// Send the model uniform and normal matrix to the currently bound shader,
@@ -328,29 +357,77 @@ void display()
 
 		/* Draw our cube*/
 		aCube.drawCube(drawmode);
+		model.push(model.top());
+		{
+			model.top() = translate(model.top(), vec3(sphere_x-x, sphere_y-y, sphere_z-z));
+			model.top() = translate(model.top(), vec3(x - 0.6, y + 0.275, z - 0.7));
+
+			//model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y - 0.6, z + sphere_z));
+
+			model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
+			model.top() = scale(model.top(), vec3(1/0.125f, 1/2.2f, 1/0.1f));//scale equally in all axis
+
+			//model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
+
+			// Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
+			glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+			normalmatrix = transpose(inverse(mat3(view * model.top())));
+			glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+			aSphere.drawSphere(drawmode); // Draw our sphere
+
+		//	model.top() = translate(model.top(), vec3(x + 0.5f, y - 0.7, z+0.2));
+		//	model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y, z + sphere_z));
+		//	model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
+		//	model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
+
+		// //Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
+		//	glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+		//	normalmatrix = transpose(inverse(mat3(view * model.top())));
+		//	glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+		//aSphere.drawSphere(drawmode); // Draw our sphere
+		}
+		model.pop();
 	}
 	model.pop();
 
-	// This block of code draws the tube cylinder of the disk
-	model.push(model.top());
-	{
-		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(x + 0.6, y + 0.58, z + 0.16));
-		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.04f, 0.3f, 0.04f));//scale equally in all axis
-		//model.top() = scale(model.top(), vec3(model_scale / 50, model_scale / 10, model_scale / 50));//scale equally in all axis
+	// This block of code draws the sphere
+	//model.push(model.top());
+	//{
+	//	model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y, z + sphere_z));
+	//	//for stick rotation
+	//	model.top() = rotate(model.top(), radians(rotation_angle), vec3(0, 0, 1));
+	//	//Rotate up and down
+	//	model.top() = rotate(model.top(), radians(rotation_lift), vec3(1, 0, 0));
 
-		// Send the model uniform and normal matrix to the currently bound shader,
-		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+	//	//model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y - 0.6, z + sphere_z));
 
-		// Recalculate the normal matrix and send to the vertex shader
-		normalmatrix = transpose(inverse(mat3(view * model.top())));
-		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+	//	model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
+	//	//model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
 
-		/* Draw our cube*/
-		tube.drawCylinder(drawmode);
-	}
-	model.pop();
+	//	// Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
+	//	glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+	//	normalmatrix = transpose(inverse(mat3(view * model.top())));
+	//	glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+	//	aSphere.drawSphere(drawmode); // Draw our sphere
+
+	////	model.top() = translate(model.top(), vec3(x + 0.5f, y - 0.7, z+0.2));
+	////	model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y, z + sphere_z));
+	////	model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
+	////	model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
+
+	//// //Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
+	////	glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+	////	normalmatrix = transpose(inverse(mat3(view * model.top())));
+	////	glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+	////aSphere.drawSphere(drawmode); // Draw our sphere
+	//}
+	//model.pop();
+
+
 
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
@@ -391,18 +468,28 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'V') y += speed;
 	if (key == 'B') z -= speed;
 	if (key == 'N') z += speed;
-	if (key == '1') light_x -= speed;
-	if (key == '2') light_x += speed;
-	if (key == '3') light_y -= speed;
-	if (key == '4') light_y += speed;
-	if (key == '5') light_z -= speed;
-	if (key == '6') light_z += speed;
+	//if (key == '1') light_x -= speed;
+	//if (key == '2') light_x += speed;
+	//if (key == '3') light_y -= speed;
+	//if (key == '4') light_y += speed;
+	//if (key == '5') light_z -= speed;
+	//if (key == '6') light_z += speed;
 	if (key == '7') vx -= 1.f;
 	if (key == '8') vx += 1.f;
 	if (key == '9') vy -= 1.f;
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;	
+		
+	if (key == '1') sphere_x -= 0.001f;
+	if (key == '2') sphere_x += 0.001f;
+
+	if (key == '3') sphere_y -= 0.001f;
+	if (key == '4') sphere_y += 0.001f;
+
+	if (key == '5') sphere_z -= 0.001f;
+	if (key == '6') sphere_z += 0.001f;
+
 
 
 	if (key == 'L') {
@@ -416,21 +503,24 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		}
 	}
 	if (key == 'J') {
-		if (rotation_lift > -5.0f) {
+		if (rotation_lift > -6.25f) {
 			rotation_lift -= 1.25f;
 		}
 	}
 	if (key == 'H') {
-		if (rotation_lift < 2.5f) {
+		if (rotation_lift < 0.0f) {
 			rotation_lift += 1.25f;
 		}
 	}
 
 
-
 	//cout << "view x" << vx << endl;
 	//cout << "view y" << vz << endl;
-	//cout << "view z" << vy << endl;
+	//cout << "view z" << vy << endl;	
+	 
+	cout << "sphere x" << sphere_x<< endl;
+	cout << "sphere y" << sphere_y<< endl;
+	cout << "sphere z" << sphere_z<< endl;
 
 
 	//cout << "light x" << light_x << endl;

@@ -1,6 +1,6 @@
 Finish shapes
-	stick support
-	sphere
+	stick support x
+	sphere x
 	sphere tube
 	Switch
 
@@ -9,3 +9,11 @@ Light
 	add switch light
 
 doc
+
+
+sphere x0.6
+sphere y-0.51
+sphere z0.24
+
+model.top() = translate(model.top(), vec3(x - 0.6, y + 0.275, z - 0.7));
+
