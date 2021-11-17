@@ -1,0 +1,11 @@
+Finish shapes
+	stick support
+	sphere
+	sphere tube
+	Switch
+
+Light
+	move to fragment shader
+	add switch light
+
+doc

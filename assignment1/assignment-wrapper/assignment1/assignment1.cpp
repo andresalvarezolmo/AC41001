@@ -307,8 +307,9 @@ void display()
 	model.push(model.top());
 	{
 		// Define the model transformations for the cube
-		model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.29f));
-
+		//model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.26f));
+		//model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.235f));
+		model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.275f));
 
 		//for stick rotation
 		model.top() = rotate(model.top(), radians(rotation_angle), vec3(0, 0, 1));
@@ -316,7 +317,7 @@ void display()
 		model.top() = rotate(model.top(), radians(rotation_lift), vec3(1, 0, 0));
 		model.top() = translate(model.top(), vec3(0, -0.6f, 0));
 
-		model.top() = scale(model.top(), vec3(0.125f, 2.5f, 0.1f));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(0.125f, 2.2f, 0.1f));//scale equally in all axis
 
 		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
@@ -327,6 +328,27 @@ void display()
 
 		/* Draw our cube*/
 		aCube.drawCube(drawmode);
+	}
+	model.pop();
+
+	// This block of code draws the tube cylinder of the disk
+	model.push(model.top());
+	{
+		// Define the model transformations for the cube
+		model.top() = translate(model.top(), vec3(x + 0.6, y + 0.58, z + 0.16));
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(0.04f, 0.3f, 0.04f));//scale equally in all axis
+		//model.top() = scale(model.top(), vec3(model_scale / 50, model_scale / 10, model_scale / 50));//scale equally in all axis
+
+		// Send the model uniform and normal matrix to the currently bound shader,
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+
+		// Recalculate the normal matrix and send to the vertex shader
+		normalmatrix = transpose(inverse(mat3(view * model.top())));
+		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+		/* Draw our cube*/
+		tube.drawCylinder(drawmode);
 	}
 	model.pop();
 
@@ -380,7 +402,9 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '9') vy -= 1.f;
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
-	if (key == 'P') vz += 1.f;
+	if (key == 'P') vz += 1.f;	
+
+
 	if (key == 'L') {
 		if (rotation_angle < 0) {
 			rotation_angle += 5.0f;
@@ -392,25 +416,26 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		}
 	}
 	if (key == 'J') {
-		if (rotation_lift > -10.0f) {
-			rotation_lift -= 2.5f;
+		if (rotation_lift > -5.0f) {
+			rotation_lift -= 1.25f;
 		}
 	}
 	if (key == 'H') {
 		if (rotation_lift < 2.5f) {
-			rotation_lift += 2.5f;
+			rotation_lift += 1.25f;
 		}
 	}
 
 
-	cout << "view x" << vx << endl;
-	cout << "view y" << vz << endl;
-	cout << "view z" << vy << endl;
+
+	//cout << "view x" << vx << endl;
+	//cout << "view y" << vz << endl;
+	//cout << "view z" << vy << endl;
 
 
-	cout << "light x" << light_x << endl;
-	cout << "light y" << light_y << endl;
-	cout << "light z" << light_z << endl;
+	//cout << "light x" << light_x << endl;
+	//cout << "light y" << light_y << endl;
+	//cout << "light z" << light_z << endl;
 	cout << "rotation lift" << rotation_lift << endl;
 
 	if (key == 'M' && action != GLFW_PRESS)
