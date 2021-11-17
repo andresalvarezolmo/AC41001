@@ -4,9 +4,18 @@ Finish shapes
 	sphere tube
 	Switch
 
+Change cylinder colours x
+Rotate disc x
+
+Create own shape
+
 Light
 	move to fragment shader
 	add switch light
+
+organise controls
+
+comment code
 
 doc
 

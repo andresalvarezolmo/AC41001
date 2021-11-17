@@ -14,6 +14,7 @@
 const float PI = 3.141592653589f;  /* pi */
 
 #include <iostream>
+#include <cmath>
 
 using namespace glm;
 using namespace std;
@@ -48,9 +49,9 @@ Cylinder::~Cylinder()
 {
 }
 
-void Cylinder::makeCylinder()
+void Cylinder::makeCylinder(bool mixedCylinder)
 {
-	defineVertices();
+	defineVertices(mixedCylinder);
 
 	GLuint pindices[406]; //204 //201
 	for (int i = 0; i < 101; i++)
@@ -78,7 +79,7 @@ void Cylinder::makeCylinder()
 }
 	//based on
 	//https://www.opengl.org/discussion_boards/showthread.php/167115-Creating-cylinder
-	void Cylinder::defineVertices()
+	void Cylinder::defineVertices(bool mixedCylinder)
 	{
 		vec3 vertices[402];
 		vec3 normals[402];
@@ -92,6 +93,7 @@ void Cylinder::makeCylinder()
 		normals[0] = vec3(0.0, 1.0, 0.0);
 		colour[0] = this->colour;
 
+
 		//for every point around the circle
 		for (int i = 1; i < this->definition +1; i++)
 		{
@@ -103,7 +105,8 @@ void Cylinder::makeCylinder()
 
 			vertices[i] = vec3(x, y, z);
 			normals[i] = vec3(0.0, 1.0, 0.0);
-			colour[i] = this->colour;
+			mixedCylinder ? (i <= 99) ?  colour[i] = this->colour : colour[i] = vec3(1, 0, 0) : colour[i] = this->colour;
+			
 		}
 		vertices[101] = vec3(0, -halfLength, 0);
 		normals[101] = vec3(0.0, -1.0, 0.0);
@@ -131,6 +134,7 @@ void Cylinder::makeCylinder()
 			vertices[i] = vertices[top];
 			normals[i] = vec3(vertices[top].x, 0.0, vertices[top].z);
 			colour[i] = this->colour;
+			//colour[i] = vec3(abs(1-this->colour.x), abs(1 - this->colour.y), abs(1 - this->colour.z));
 			vertices[i + 1] = vertices[bottom];
 			normals[i + 1] = vec3(vertices[bottom].x, 0.0, vertices[bottom].z);
 			colour[i + 1] = this->colour;

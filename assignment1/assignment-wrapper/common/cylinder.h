@@ -27,13 +27,12 @@ private:
 	GLuint attribute_v_normal;
 	GLuint attribute_v_colours;
 
-	void defineVertices();
-
 public:
 	Cylinder();
 	Cylinder(glm::vec3 c);
 	~Cylinder();
-	void makeCylinder();
+	void makeCylinder(bool mixedCylinder);
+	void defineVertices(bool mixedCylinder);
 	void drawCylinder(int drawmode);
 };
 

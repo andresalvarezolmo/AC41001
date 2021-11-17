@@ -67,8 +67,11 @@ GLuint colourmodeID, emitmodeID, attenuationmodeID;
 
 GLfloat aspect_ratio;		/* Aspect ratio of the window defined in the reshape callback*/
 
-GLfloat rotation_angle;	//rotation	
-GLfloat rotation_lift;	//rotation	
+GLfloat rotation_angle;	//lateral rotation disk
+GLfloat rotation_lift;	//vertical rotation disk	
+
+GLfloat disk_rotation_angle;
+
 GLuint numspherevertices;
 
 /* Global instances of our objects */
@@ -113,6 +116,7 @@ void init(GLWrapper* glw)
 	numlats = 40;		// Number of latitudes in our sphere
 	numlongs = 40;		// Number of longitudes in our sphere
 
+	disk_rotation_angle = 0.0;
 
 	sphere_x = 0.6f;
 	sphere_y = -0.51f;
@@ -148,9 +152,9 @@ void init(GLWrapper* glw)
 	/* create our sphere and cube objects */
 	aSphere.makeSphere(numlats, numlongs);
 	aCube.makeCube();
-	bigCylinder.makeCylinder();
-	smallCylinder.makeCylinder();
-	tube.makeCylinder();
+	bigCylinder.makeCylinder(true);
+	smallCylinder.makeCylinder(false);
+	tube.makeCylinder(false);
 }
 
 /* Called to update the display. Note that this function is called in the event loop in the wrapper
@@ -253,6 +257,8 @@ void display()
 	{
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.15));
+		if (rotation_angle == -30 && rotation_lift == 0) disk_rotation_angle += 0.1;
+		model.top() = rotate(model.top(), radians(disk_rotation_angle), vec3(0, 0, 1));//scale equally in all axis
 		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
 		model.top() = scale(model.top(), vec3(0.59f, 0.03f, 0.59f));//scale equally in all axis
 		//model.top() = scale(model.top(), vec3(model_scale/1.7, model_scale / 25, model_scale/1.7));//scale equally in all axis
@@ -490,6 +496,15 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '5') sphere_z -= 0.001f;
 	if (key == '6') sphere_z += 0.001f;
 
+	if (key == '3') sphere_y -= 0.001f;
+	if (key == '4') sphere_y += 0.001f;
+
+	if (key == '5') sphere_z -= 0.001f;
+	if (key == '6') sphere_z += 0.001f;
+	
+
+	if (key == 'U') disk_rotation_angle -= 0.5;
+	if (key == 'I') disk_rotation_angle += 0.5;
 
 
 	if (key == 'L') {
@@ -513,20 +528,21 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		}
 	}
 
+	cout << disk_rotation_angle << endl;
 
 	//cout << "view x" << vx << endl;
 	//cout << "view y" << vz << endl;
 	//cout << "view z" << vy << endl;	
 	 
-	cout << "sphere x" << sphere_x<< endl;
-	cout << "sphere y" << sphere_y<< endl;
-	cout << "sphere z" << sphere_z<< endl;
+	//cout << "sphere x" << sphere_x<< endl;
+	//cout << "sphere y" << sphere_y<< endl;
+	//cout << "sphere z" << sphere_z<< endl;
 
 
 	//cout << "light x" << light_x << endl;
 	//cout << "light y" << light_y << endl;
 	//cout << "light z" << light_z << endl;
-	cout << "rotation lift" << rotation_lift << endl;
+	//cout << "rotation lift" << rotation_lift << endl;
 
 	if (key == 'M' && action != GLFW_PRESS)
 	{
