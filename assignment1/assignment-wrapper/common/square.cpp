@@ -20,11 +20,9 @@ Square::Square()
 	numvertices = 6;
 }
 
-
 Square::~Square()
 {
 }
-
 
 /* Make a cube from hard-coded vertex positions and normals  */
 void Square::makeSquare()
