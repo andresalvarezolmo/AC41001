@@ -33,6 +33,7 @@ if you prefer */
 #include "sphere.h"
 #include "cube.h"
 #include "cylinder.h"
+#include "square.h"
 
 /* Define buffer object indices */
 GLuint elementbuffer;
@@ -77,6 +78,7 @@ GLuint numspherevertices;
 /* Global instances of our objects */
 Sphere aSphere;
 Cube aCube;
+Square aSquare;
 Cylinder bigCylinder(glm::vec3(0.0f, 0.0f, 0.0f));
 Cylinder smallCylinder(glm::vec3(1.0f, 0.0f, 0.0f));
 Cylinder tube(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -118,9 +120,6 @@ void init(GLWrapper* glw)
 
 	disk_rotation_angle = 0.0;
 
-	sphere_x = 0.6f;
-	sphere_y = -0.51f;
-	sphere_z = 0.22f;
 	// Generate index (name) for one vertex array object
 	glGenVertexArrays(1, &vao);
 
@@ -150,6 +149,7 @@ void init(GLWrapper* glw)
 	normalmatrixID = glGetUniformLocation(program, "normalmatrix");
 
 	/* create our sphere and cube objects */
+	aSquare.makeSquare();
 	aSphere.makeSphere(numlats, numlongs);
 	aCube.makeCube();
 	bigCylinder.makeCylinder(true);
@@ -249,6 +249,27 @@ void display()
 
 		/* Draw our cube*/
 		aCube.drawCube(drawmode);
+
+	}
+	model.pop();	
+	
+	// This block of code draws the square
+	model.push(model.top());
+	{
+		// Define the model transformations for the square
+		model.top() = translate(model.top(), vec3(x-0.59f, y-0.59f, z + 0.14));
+		model.top() = scale(model.top(), vec3(0.3, 0.3, 0.05));//scale equally in all axis
+		//model.top() = scale(model.top(), vec3(3*model_scale, 3*model_scale, model_scale/2));//scale equally in all axis
+
+		// Send the model uniform and normal matrix to the currently bound shader,
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+
+	//	// Recalculate the normal matrix and send to the vertex shader
+		normalmatrix = transpose(inverse(mat3(view * model.top())));
+		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+		/* Draw our cube*/
+		aSquare.drawSquare(drawmode);
 	}
 	model.pop();
 
@@ -365,7 +386,7 @@ void display()
 		aCube.drawCube(drawmode);
 		model.push(model.top());
 		{
-			model.top() = translate(model.top(), vec3(sphere_x-x, sphere_y-y, sphere_z-z));
+			model.top() = translate(model.top(), vec3(0.6-x, -0.51-y, 0.22-z));
 			model.top() = translate(model.top(), vec3(x - 0.6, y + 0.275, z - 0.7));
 
 			//model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y - 0.6, z + sphere_z));
@@ -474,33 +495,18 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'V') y += speed;
 	if (key == 'B') z -= speed;
 	if (key == 'N') z += speed;
-	//if (key == '1') light_x -= speed;
-	//if (key == '2') light_x += speed;
-	//if (key == '3') light_y -= speed;
-	//if (key == '4') light_y += speed;
-	//if (key == '5') light_z -= speed;
-	//if (key == '6') light_z += speed;
+	if (key == '1') light_x -= speed;
+	if (key == '2') light_x += speed;
+	if (key == '3') light_y -= speed;
+	if (key == '4') light_y += speed;
+	if (key == '5') light_z -= speed;
+	if (key == '6') light_z += speed;
 	if (key == '7') vx -= 1.f;
 	if (key == '8') vx += 1.f;
 	if (key == '9') vy -= 1.f;
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;	
-		
-	if (key == '1') sphere_x -= 0.001f;
-	if (key == '2') sphere_x += 0.001f;
-
-	if (key == '3') sphere_y -= 0.001f;
-	if (key == '4') sphere_y += 0.001f;
-
-	if (key == '5') sphere_z -= 0.001f;
-	if (key == '6') sphere_z += 0.001f;
-
-	if (key == '3') sphere_y -= 0.001f;
-	if (key == '4') sphere_y += 0.001f;
-
-	if (key == '5') sphere_z -= 0.001f;
-	if (key == '6') sphere_z += 0.001f;
 	
 
 	if (key == 'U') disk_rotation_angle -= 0.5;
@@ -527,8 +533,6 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 			rotation_lift += 1.25f;
 		}
 	}
-
-	cout << disk_rotation_angle << endl;
 
 	//cout << "view x" << vx << endl;
 	//cout << "view y" << vz << endl;

@@ -7,17 +7,19 @@ Finish shapes
 Change cylinder colours x
 Rotate disc x
 
-Create own shape
+Create own shape 18/x
 
-Light
+Light 18
 	move to fragment shader
 	add switch light
 
-organise controls
+move stick as disk spins
 
-comment code
+organise controls 19
+ 
+comment code 19
 
-doc
+doc 19
 
 
 sphere x0.6

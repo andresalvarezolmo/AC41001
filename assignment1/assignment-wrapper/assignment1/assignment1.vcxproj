@@ -144,12 +144,16 @@
     <ClCompile Include="..\common\cube.cpp" />
     <ClCompile Include="..\common\cylinder.cpp" />
     <ClCompile Include="..\common\sphere.cpp" />
+    <ClCompile Include="..\common\square.cpp" />
     <ClCompile Include="..\common\wrapper_glfw.cpp" />
     <ClCompile Include="assignment1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment-shader.frag" />
     <None Include="vertex-shader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\square.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
