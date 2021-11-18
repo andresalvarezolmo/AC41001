@@ -1,4 +1,4 @@
-Finish shapes
+fFinish shapes
 	stick support x
 	sphere x
 	sphere tube
@@ -11,16 +11,16 @@ Create own shape 18/x
 
 Light 18
 	move to fragment shader x
-	add switch light
-	add second light
+	add switch light 
+	add second light 
 
 move stick as disk spins x
 
 modify cube class to have a single colour x
 
-organise controls 19
+organise controls 19 
  
-comment code 19
+comment code 19 
 
 doc 19
 

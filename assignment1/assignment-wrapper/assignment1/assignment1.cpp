@@ -63,7 +63,7 @@ GLfloat light_y;
 GLfloat light_z;
 
 /* Uniforms*/
-GLuint modelID, viewID, projectionID, lightposID, normalmatrixID;
+GLuint modelID, viewID, projectionID, lightposID, normalmatrixID, bulbpositionID;
 GLuint colourmodeID, emitmodeID, attenuationmodeID;
 
 GLfloat aspect_ratio;		/* Aspect ratio of the window defined in the reshape callback*/
@@ -76,6 +76,8 @@ GLfloat disk_rotation_angle;
 GLuint numspherevertices;
 
 /* Global instances of our objects */
+Sphere stickSphere;
+Sphere bulbSphere;
 Sphere aSphere;
 Cube aCube;
 Square aSquare;
@@ -151,6 +153,8 @@ void init(GLWrapper* glw)
 	/* create our sphere and cube objects */
 	aSquare.makeSquare();
 	aSphere.makeSphere(numlats, numlongs, vec3(0.0,0.0,1.0));
+	bulbSphere.makeSphere(numlats, numlongs, vec3(1.0, 0.647, 0.0));
+	stickSphere.makeSphere(numlats, numlongs, vec3(1.0,0.0,0.0));
 	aCube.makeCube();
 	bigCylinder.makeCylinder(true);
 	smallCylinder.makeCylinder(false);
@@ -264,12 +268,28 @@ void display()
 		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
-	//	// Recalculate the normal matrix and send to the vertex shader
+		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
 		/* Draw our cube*/
 		aSquare.drawSquare(drawmode);
+	}
+	model.pop();
+
+	//sphere bulb
+	model.push(model.top());
+	{
+		model.top() = translate(model.top(), vec3(x - 0.59f, y + 0.59f, z + 0.14));
+		model.top() = scale(model.top(), vec3(0.1f, 0.1f, 0.1f)); // make a small sphere
+																	 // Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
+		normalmatrix = transpose(inverse(mat3(view * model.top())));
+		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
+
+		/* Draw our lightposition sphere  with emit mode on*/
+		//glUniform1ui(emitmodeID, emitmode);
+		bulbSphere.drawSphere(drawmode);
 	}
 	model.pop();
 
@@ -367,7 +387,7 @@ void display()
 		//model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.235f));
 		model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.275f));
 
-		if (rotation_angle <= -17.5 && rotation_angle >= -40 && rotation_lift == 0) rotation_angle -= 0.005;
+		if (rotation_angle <= -17.5 && rotation_angle >= -40 && rotation_lift == 0) rotation_angle -= 0.0025;
 		//if (rotation_angle <= -20 && rotation_lift == 0) rotation_angle -= 0.002;
 
 		//for stick rotation
@@ -404,7 +424,7 @@ void display()
 			normalmatrix = transpose(inverse(mat3(view * model.top())));
 			glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-			aSphere.drawSphere(drawmode); // Draw our sphere
+			stickSphere.drawSphere(drawmode); // Draw our sphere
 
 		//	model.top() = translate(model.top(), vec3(x + 0.5f, y - 0.7, z+0.2));
 		//	model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y, z + sphere_z));
