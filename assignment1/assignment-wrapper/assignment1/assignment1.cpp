@@ -278,7 +278,7 @@ void display()
 	{
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.15));
-		if (rotation_angle == -30 && rotation_lift == 0) disk_rotation_angle += 0.1;
+		if (rotation_angle <= -17.5 && rotation_angle >= -40 && rotation_lift == 0) disk_rotation_angle -= 0.1;
 		model.top() = rotate(model.top(), radians(disk_rotation_angle), vec3(0, 0, 1));//scale equally in all axis
 		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
 		model.top() = scale(model.top(), vec3(0.59f, 0.03f, 0.59f));//scale equally in all axis
@@ -366,6 +366,9 @@ void display()
 		//model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.26f));
 		//model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.235f));
 		model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.275f));
+
+		if (rotation_angle <= -17.5 && rotation_angle >= -40 && rotation_lift == 0) rotation_angle -= 0.005;
+		//if (rotation_angle <= -20 && rotation_lift == 0) rotation_angle -= 0.002;
 
 		//for stick rotation
 		model.top() = rotate(model.top(), radians(rotation_angle), vec3(0, 0, 1));
@@ -481,12 +484,12 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	if (key == 'Q') angle_inc_x -= speed;
-	if (key == 'W') angle_inc_x += speed;
-	if (key == 'E') angle_inc_y -= speed;
-	if (key == 'R') angle_inc_y += speed;
-	if (key == 'T') angle_inc_z -= speed;
-	if (key == 'Y') angle_inc_z += speed;
+	//if (key == 'Q') angle_inc_x -= speed;
+	//if (key == 'W') angle_inc_x += speed;
+	//if (key == 'E') angle_inc_y -= speed;
+	//if (key == 'R') angle_inc_y += speed;
+	//if (key == 'T') angle_inc_z -= speed;
+	//if (key == 'Y') angle_inc_z += speed;
 	if (key == 'A') model_scale -= speed / 0.5f;
 	if (key == 'S') model_scale += speed / 0.5f;
 	if (key == 'Z') x -= speed;
@@ -507,20 +510,15 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;	
-	
-
-	if (key == 'U') disk_rotation_angle -= 0.5;
-	if (key == 'I') disk_rotation_angle += 0.5;
-
 
 	if (key == 'L') {
 		if (rotation_angle < 0) {
-			rotation_angle += 5.0f;
+			rotation_angle += 1.25f;
 		}
 	}
 	if (key == 'K') {
-		if (rotation_angle > -30) {
-			rotation_angle -= 5.0f;
+		if (rotation_angle > -25) {
+			rotation_angle -= 1.25f;
 		}
 	}
 	if (key == 'J') {

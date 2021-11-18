@@ -25,7 +25,6 @@ Sphere::~Sphere()
 {
 }
 
-
 /* Make a sphere from two triangle fans (one at each pole) and triangle strips along latitudes */
 /* This version uses indexed vertex buffers for both the fans at the poles and the latitude strips */
 void Sphere::makeSphere(GLuint numlats, GLuint numlongs, glm::vec3 colour)

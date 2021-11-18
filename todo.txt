@@ -12,8 +12,9 @@ Create own shape 18/x
 Light 18
 	move to fragment shader x
 	add switch light
+	add second light
 
-move stick as disk spins
+move stick as disk spins x
 
 modify cube class to have a single colour x
 
