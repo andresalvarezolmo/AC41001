@@ -150,7 +150,7 @@ void init(GLWrapper* glw)
 
 	/* create our sphere and cube objects */
 	aSquare.makeSquare();
-	aSphere.makeSphere(numlats, numlongs);
+	aSphere.makeSphere(numlats, numlongs, vec3(0.0,0.0,1.0));
 	aCube.makeCube();
 	bigCylinder.makeCylinder(true);
 	smallCylinder.makeCylinder(false);

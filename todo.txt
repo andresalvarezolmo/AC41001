@@ -15,7 +15,7 @@ Light 18
 
 move stick as disk spins
 
-modify cube class to have a single colour
+modify cube class to have a single colour x
 
 organise controls 19
  

@@ -16,7 +16,7 @@ public:
 	Sphere();
 	~Sphere();
 
-	void makeSphere(GLuint numlats, GLuint numlongs);
+	void makeSphere(GLuint numlats, GLuint numlongs, glm::vec3 colour);
 	void drawSphere(int drawmode);
 
 	// Define vertex buffer object names (e.g as globals)
