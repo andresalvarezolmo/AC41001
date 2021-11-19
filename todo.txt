@@ -27,6 +27,11 @@ comment code 19
 doc 19
 
 
+light x0.0999999
+light y0.45
+light z0.65
+
+
 sphere x0.6
 sphere y-0.51
 sphere z0.24

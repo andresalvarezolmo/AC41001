@@ -121,7 +121,7 @@ void init(GLWrapper* glw)
 	y = 0;
 	z = 0;
 	vx = 0; vx = 0, vz = 4.f;
-	light_x = 0.75f; light_y = 0.45f; light_z = 0.65f;
+	light_x = 0.1f; light_y = 0.45f; light_z = 0.65f;
 	angle_inc_x = angle_inc_y = angle_inc_z = 0;
 	model_scale = 1.f;
 	aspect_ratio = 1.3333f;
@@ -592,9 +592,9 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	//cout << "sphere z" << sphere_z<< endl;
 
 
-	//cout << "light x" << light_x << endl;
-	//cout << "light y" << light_y << endl;
-	//cout << "light z" << light_z << endl;
+	cout << "light x" << light_x << endl;
+	cout << "light y" << light_y << endl;
+	cout << "light z" << light_z << endl;
 	//cout << "rotation lift" << rotation_lift << endl;
 
 	if (key == 'M' && action != GLFW_PRESS)
