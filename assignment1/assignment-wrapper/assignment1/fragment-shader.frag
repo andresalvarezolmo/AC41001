@@ -53,7 +53,7 @@ void main()
 	if (emitmode == 1) emissive = vec4(1.0, 1.0, 0.8, 1.0);
 
 	//Calculate output colour, based on the attenuation, diffuse and specular components
-	outputColour = attenuation * (diffuse + specular) + emissive + global_ambient + fambientcolour;
+	outputColour = attenuation * (diffuse + specular * 0.6) + emissive + global_ambient + fambientcolour;
 }
 
 //in vec4 fcolour;

@@ -18,6 +18,8 @@ move stick as disk spins x
 
 modify cube class to have a single colour x
 
+fix the lighting x
+
 organise controls 19 
  
 comment code 19 
