@@ -46,7 +46,6 @@ GLuint colourmode;	/* Index of a uniform to switch the colour mode in the vertex
 					  I've included this to show you how to pass in an unsigned integer into
 					  your vertex shader. */
 GLuint emitmode;
-GLuint attenuationmode;
 
 /* Position and view globals */
 GLfloat angle_x, angle_inc_x, x, model_scale, z, y, vx, vy, vz;
@@ -64,7 +63,7 @@ GLfloat light_z;
 
 /* Uniforms*/
 GLuint modelID, viewID, projectionID, lightposID, normalmatrixID, bulbpositionID;
-GLuint colourmodeID, emitmodeID, attenuationmodeID;
+GLuint colourmodeID, emitmodeID;
 
 GLfloat aspect_ratio;		/* Aspect ratio of the window defined in the reshape callback*/
 
@@ -125,7 +124,6 @@ void init(GLWrapper* glw)
 	model_scale = 1.f;
 	aspect_ratio = 1.3333f;
 	colourmode = 1; emitmode = 0;
-	attenuationmode = 1; // Attenuation is on by default
 	numlats = 40;		// Number of latitudes in our sphere
 	numlongs = 40;		// Number of longitudes in our sphere
 
@@ -154,7 +152,6 @@ void init(GLWrapper* glw)
 	modelID = glGetUniformLocation(program, "model");
 	colourmodeID = glGetUniformLocation(program, "colourmode");
 	emitmodeID = glGetUniformLocation(program, "emitmode");
-	attenuationmodeID = glGetUniformLocation(program, "attenuationmode");
 	viewID = glGetUniformLocation(program, "view");
 	projectionID = glGetUniformLocation(program, "projection");
 	lightposID = glGetUniformLocation(program, "lightpos");
@@ -217,7 +214,6 @@ void display()
 	// Send our projection and view uniforms to the currently bound shader
 	// I do that here because they are the same for all objects
 	glUniform1ui(colourmodeID, colourmode);
-	glUniform1ui(attenuationmodeID, attenuationmode);
 	glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(projectionID, 1, GL_FALSE, &projection[0][0]);
 	glUniform4fv(lightposID, 1, value_ptr(lightpos));
@@ -583,11 +579,6 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 
 	}
 
-	/* Turn attenuation on and off */
-	if (key == '.' && action != GLFW_PRESS)
-	{
-		attenuationmode = !attenuationmode;
-	}
 }
 
 void displayControls() {
@@ -610,10 +601,9 @@ void displayControls() {
 	cout << "B, N -> Move object in Z axis;\n" << endl;
 
 	cout << "SPACE -> Colour mode" << endl;
-	cout << ". -> Attenuation mode" << endl;
 }
 
-/* Entry point of program */
+/* Entry point of program */	
 int main(int argc, char* argv[])
 {
 	GLWrapper* glw = new GLWrapper(1024, 768, "Position light example");;
