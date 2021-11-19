@@ -3,7 +3,15 @@
 
 #version 420 core
 
-vec4 specular_colour = vec4(1.0, 0.8, 0.6, 1.0);
+vec4 specular_colour[] = {
+	vec4(0.0, 0.2, 0.9, 1.0),
+	vec4(1.0, 0.8, 0.6, 1.0),
+	vec4(0.0, 0.9, 0.6, 1.0),
+	vec4(0.8, 0.1, 0.3, 1.0),
+	vec4(0.5, 0.0, 0.6, 1.0),
+	vec4(0.0, 0.7, 0.0, 1.0),
+};
+
 vec4 global_ambient = vec4(0.05, 0.05, 0.05, 1.0);
 int shininess = 8;
 
@@ -13,14 +21,17 @@ in vec4 fdiffusecolour, fambientcolour;
 
 uniform uint attenuationmode;
 uniform uint emitmode;
+uniform uint colourmode;
 
 out vec4 outputColour;
 void main()
 {
 	//Create a vec4 (0,0,0) for the emissive light, set to 0 unless emitmode is true
 	vec4 emissive = vec4(0);
-	vec4 fambientcolour = fdiffusecolour * 0.2;
-	vec4 fspecularcolour = vec4(1.0, 0.8, 0.6, 1.0);
+	vec4 fambientcolour = fdiffusecolour * 0.15 + specular_colour[colourmode] * 0.25;
+	float power = 1.75;
+	fambientcolour = vec4(pow(fambientcolour.x,power),pow(fambientcolour.y,power),pow(fambientcolour.z,power),1.0);
+	vec4 fspecularcolour = specular_colour[colourmode];
 	float distancetolight = length(flightdir);
 
 	//Normalise interpolated vextors
@@ -50,7 +61,7 @@ void main()
 	}
 
 	//If emitemode is enable, turn on emissive lighting
-	if (emitmode == 1) emissive = vec4(1.0, 1.0, 0.8, 1.0);
+	if (emitmode == 1) emissive = specular_colour[colourmode];
 
 	//Calculate output colour, based on the attenuation, diffuse and specular components
 	outputColour = attenuation * (diffuse + specular * 0.6) + emissive + global_ambient + fambientcolour;
@@ -62,3 +73,4 @@ void main()
 //{
 //	outputColor = fcolour;
 //}
+

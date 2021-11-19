@@ -2,8 +2,10 @@
 // source with attenuation
 // Iain Martin 2018
 
+
 // Specify minimum OpenGL version
 #version 420 core
+
 
 // Define the vertex attributes
 layout(location = 0) in vec3 position;
@@ -27,10 +29,10 @@ void main()
 	vec3 light_pos3 = lightpos.xyz;
 
 	// Switch the vertex colour based on the colourmode
-	if (colourmode == 1)
-		fdiffusecolour = colour;
-	else
-		fdiffusecolour = vec4(1.0, 0, 0, 1.0);
+//	if (colourmode == 1)
+	fdiffusecolour = colour;
+//	else
+//		fdiffusecolour = vec4(1.0, 0, 0, 1.0);
 
 	mat4 mv_matrix = view * model;
 	fposition = (mv_matrix * position_h).xyz;
@@ -116,3 +118,4 @@ void main()
 //
 //
 //
+

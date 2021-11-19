@@ -104,7 +104,14 @@ void init(GLWrapper* glw)
 	vec4 v2 = m1 * v1;
 	cout << "v2 " << v2.x << ", " << v2.y << ", " << v2.z << ", " << v2.w << endl;
 
-
+	vec4 specular_colour[] = {
+		vec4(0.0, 0.2, 0.9, 1.0),
+		vec4(1.0, 0.8, 0.6, 1.0),
+		vec4(0.0, 0.9, 0.6, 1.0),
+		vec4(0.8, 0.1, 0.3, 1.0),
+		vec4(0.5, 0.0, 0.6, 1.0),
+		vec4(0.0, 0.7, 0.0, 1.0),
+	};
 
 	/* Set the object transformation controls to their initial values */
 	rotation_angle = 0.0f;
@@ -156,9 +163,9 @@ void init(GLWrapper* glw)
 
 	/* create our sphere and cube objects */
 	aSquare.makeSquare();
-	aSphere.makeSphere(numlats, numlongs, vec3(0.0,0.0,1.0));
+	aSphere.makeSphere(numlats, numlongs, vec3(1.0, 1.0, 1.0));
 	bulbSphere.makeSphere(numlats, numlongs, vec3(1.0, 0.647, 0.0));
-	stickSphere.makeSphere(numlats, numlongs, vec3(1.0,0.0,0.0));
+	stickSphere.makeSphere(numlats, numlongs, vec3(1.0, 0.0, 0.0));
 	aCube.makeCube();
 	bigCylinder.makeCylinder(true);
 	smallCylinder.makeCylinder(false);
@@ -171,7 +178,7 @@ void init(GLWrapper* glw)
 void display()
 {
 	/* Define the background colour */
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.1f, 1.0f);
 
 	/* Clear the colour and frame buffers */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -260,8 +267,8 @@ void display()
 		aCube.drawCube(drawmode);
 
 	}
-	model.pop();	
-	
+	model.pop();
+
 	// This block of code draws the square
 	model.push(model.top());
 	{
@@ -419,13 +426,13 @@ void display()
 		aCube.drawCube(drawmode);
 		model.push(model.top());
 		{
-			model.top() = translate(model.top(), vec3(0.6-x, -0.51-y, 0.22-z));
+			model.top() = translate(model.top(), vec3(0.6 - x, -0.51 - y, 0.22 - z));
 			model.top() = translate(model.top(), vec3(x - 0.6, y + 0.275, z - 0.7));
 
 			//model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y - 0.6, z + sphere_z));
 
 			model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
-			model.top() = scale(model.top(), vec3(1/0.125f, 1/2.2f, 1/0.1f));//scale equally in all axis
+			model.top() = scale(model.top(), vec3(1 / 0.125f, 1 / 2.2f, 1 / 0.1f));//scale equally in all axis
 
 			//model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
 
@@ -539,8 +546,8 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '9') vy -= 1.f;
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
-	if (key == 'P') vz += 1.f;		
-	
+	if (key == 'P') vz += 1.f;
+
 	//if (key == 'U') dial_rotation_angle -= 1.f;
 	//if (key == 'I') dial_rotation_angle += 1.f;
 
@@ -548,14 +555,12 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		if (dial_rotation_angle <= 0 && dial_rotation_angle > -360) {
 			dial_rotation_angle -= 1.f;
 		}
-	}	
+	}
 	if (key == 'I') {
 		if (dial_rotation_angle < 0) {
 			dial_rotation_angle += 1.f;
 		}
 	}
-
-	cout << dial_rotation_angle << endl;
 
 	if (key == 'L') {
 		if (rotation_angle < 0) {
@@ -581,7 +586,7 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	//cout << "view x" << vx << endl;
 	//cout << "view y" << vz << endl;
 	//cout << "view z" << vy << endl;	
-	 
+
 	//cout << "sphere x" << sphere_x<< endl;
 	//cout << "sphere y" << sphere_y<< endl;
 	//cout << "sphere z" << sphere_z<< endl;
@@ -594,8 +599,10 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 
 	if (key == 'M' && action != GLFW_PRESS)
 	{
-		colourmode = !colourmode;
-		cout << "colourmode=" << colourmode << endl;
+		colourmode = colourmode++ % 4;
+		/*colourmode = !colourmode;
+		cout << "colourmode=" << colourmode << endl;*/
+
 	}
 
 	/* Turn attenuation on and off */
@@ -639,4 +646,6 @@ int main(int argc, char* argv[])
 	delete(glw);
 	return 0;
 }
+
+
 
