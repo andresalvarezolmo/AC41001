@@ -214,7 +214,6 @@ GLuint GLWrapper::LoadShader(const char *vertex_path, const char *fragment_path)
 	vertShader = BuildShader(GL_VERTEX_SHADER, vertShaderStr);
 	fragShader = BuildShader(GL_FRAGMENT_SHADER, fragShaderStr);
 
-	cout << "Linking program" << endl;
 	GLuint program = glCreateProgram();
 	glAttachShader(program, vertShader);
 	glAttachShader(program, fragShader);

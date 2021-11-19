@@ -38,3 +38,25 @@ sphere z0.24
 
 model.top() = translate(model.top(), vec3(x - 0.6, y + 0.275, z - 0.7));
 
+
+W, S -> Lift/Lower stick
+A, D -> Move Left/Right stick
+
+
+U, I-> Dial clockwise / anticlockwise
+
+7,8 -> Move scene on x axis;
+9,0 -> Move scene on y axis;
+O,P -> Move scene on z axis;
+
+1,2 -> Move light in X axis
+3,4 -> Move light in Y axis
+5,6 -> Move light in Z axis
+
+
+Z, X -> Move object in X axis;
+C, V -> Move object in Y axis;
+B, N -> Move object in Z axis;
+
+M -> Colour mode
+. -> Attenuation mode

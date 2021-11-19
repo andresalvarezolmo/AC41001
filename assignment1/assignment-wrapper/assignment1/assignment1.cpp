@@ -102,7 +102,6 @@ void init(GLWrapper* glw)
 	mat4 m1 = translate(mat4(1.0f), vec3(1.f, 0.f, 2.f));
 	vec4 v1 = vec4(-1.f, 2.f, 1.f, 1.f);
 	vec4 v2 = m1 * v1;
-	cout << "v2 " << v2.x << ", " << v2.y << ", " << v2.z << ", " << v2.w << endl;
 
 	vec4 specular_colour[] = {
 		vec4(0.0, 0.2, 0.9, 1.0),
@@ -521,14 +520,6 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	//if (key == 'Q') angle_inc_x -= speed;
-	//if (key == 'W') angle_inc_x += speed;
-	//if (key == 'E') angle_inc_y -= speed;
-	//if (key == 'R') angle_inc_y += speed;
-	//if (key == 'T') angle_inc_z -= speed;
-	//if (key == 'Y') angle_inc_z += speed;
-	if (key == 'A') model_scale -= speed / 0.5f;
-	if (key == 'S') model_scale += speed / 0.5f;
 	if (key == 'Z') x -= speed;
 	if (key == 'X') x += speed;
 	if (key == 'C') y -= speed;
@@ -548,40 +539,39 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;
 
-	//if (key == 'U') dial_rotation_angle -= 1.f;
-	//if (key == 'I') dial_rotation_angle += 1.f;
-
-	if (key == 'U') {
-		if (dial_rotation_angle <= 0 && dial_rotation_angle > -360) {
-			dial_rotation_angle -= 1.f;
+	if (key == 'D') {
+		if (rotation_angle < 0) {
+			rotation_angle += 1.25f;
 		}
 	}
-	if (key == 'I') {
+	if (key == 'A') {
+		if (rotation_angle > -25) {
+			rotation_angle -= 1.25f;
+		}
+	}
+	if (key == 'W') {
+		if (rotation_lift > -6.25f) {
+			rotation_lift -= 1.25f;
+		}
+	}
+	if (key == 'S') {
+		if (rotation_lift < 0.0f) {
+			rotation_lift += 1.25f;
+		}
+	}
+
+	if (key == 'U') {
 		if (dial_rotation_angle < 0) {
 			dial_rotation_angle += 1.f;
 		}
 	}
 
-	if (key == 'L') {
-		if (rotation_angle < 0) {
-			rotation_angle += 1.25f;
+	if (key == 'I') {
+		if (dial_rotation_angle <= 0 && dial_rotation_angle > -360) {
+			dial_rotation_angle -= 1.f;
 		}
 	}
-	if (key == 'K') {
-		if (rotation_angle > -25) {
-			rotation_angle -= 1.25f;
-		}
-	}
-	if (key == 'J') {
-		if (rotation_lift > -6.25f) {
-			rotation_lift -= 1.25f;
-		}
-	}
-	if (key == 'H') {
-		if (rotation_lift < 0.0f) {
-			rotation_lift += 1.25f;
-		}
-	}
+
 
 	//cout << "view x" << vx << endl;
 	//cout << "view y" << vz << endl;
@@ -592,9 +582,9 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	//cout << "sphere z" << sphere_z<< endl;
 
 
-	cout << "light x" << light_x << endl;
-	cout << "light y" << light_y << endl;
-	cout << "light z" << light_z << endl;
+	//cout << "light x" << light_x << endl;
+	//cout << "light y" << light_y << endl;
+	//cout << "light z" << light_z << endl;
 	//cout << "rotation lift" << rotation_lift << endl;
 
 	if (key == 'M' && action != GLFW_PRESS)
@@ -610,15 +600,31 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	{
 		attenuationmode = !attenuationmode;
 	}
-
-	/* Cycle between drawing vertices, mesh and filled polygons */
-	if (key == ',' && action != GLFW_PRESS)
-	{
-		drawmode++;
-		if (drawmode > 2) drawmode = 0;
-	}
 }
 
+void displayControls() {
+
+	cout << "CONTROLS \n" << endl;
+	cout << "W, S -> Lift/Lower stick" << endl;
+	cout << "A, D -> Move Left/Right stick\n" << endl;
+
+	cout << "U, I-> Dial clockwise / anticlockwise\n" << endl;
+
+	cout << "7,8 -> Move scene on x axis;" << endl;
+	cout << "9,0 -> Move scene on y axis;" << endl;
+	cout << "O,P -> Move scene on z axis;\n" << endl;
+
+	cout << "1,2 -> Move light in X axis" << endl;
+	cout << "3,4 -> Move light in Y axis" << endl;
+	cout << "5,6 -> Move light in Z axis\n" << endl;
+
+	cout << "Z, X -> Move object in X axis;" << endl;
+	cout << "C, V -> Move object in Y axis;" << endl;
+	cout << "B, N -> Move object in Z axis;\n" << endl;
+
+	cout << "M -> Colour mode" << endl;
+	cout << ". -> Attenuation mode" << endl;
+}
 
 /* Entry point of program */
 int main(int argc, char* argv[])
@@ -637,7 +643,9 @@ int main(int argc, char* argv[])
 	glw->setReshapeCallback(reshape);
 
 	/* Output the OpenGL vendor and version */
-	glw->DisplayVersion();
+	//glw->DisplayVersion();
+
+	displayControls();
 
 	init(glw);
 
