@@ -520,20 +520,20 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	if (key == 'Z') x -= speed;
-	if (key == 'X') x += speed;
-	if (key == 'C') y -= speed;
-	if (key == 'V') y += speed;
-	if (key == 'B') z -= speed;
-	if (key == 'N') z += speed;
-	if (key == '1') light_x -= speed;
-	if (key == '2') light_x += speed;
-	if (key == '3') light_y -= speed;
-	if (key == '4') light_y += speed;
-	if (key == '5') light_z -= speed;
-	if (key == '6') light_z += speed;
-	if (key == '7') vx -= 1.f;
-	if (key == '8') vx += 1.f;
+	if (key == 'Z' && x > -0.3) x -= speed;
+	if (key == 'X' && x < 0.3) x += speed;
+	if (key == 'C' && y > -0.3) y -= speed;
+	if (key == 'V' && y < 0.3) y += speed;
+	if (key == 'B' && z > -0.3) z -= speed;
+	if (key == 'N' && z < 0.3) z += speed;
+	if (key == '1' && light_x > -1.1) light_x -= speed;
+	if (key == '2' && light_x < 1.1) light_x += speed;
+	if (key == '3' && light_y > -0.75) light_y -= speed;
+	if (key == '4' && light_y < 0.75) light_y += speed;
+	if (key == '5' && light_z > 0.25) light_z -= speed;
+	if (key == '6' && light_z < 1) light_z += speed;
+	if (key == '7' && vx > -8.f) vx -= 1.f;
+	if (key == '8' && vx < 8.f) vx += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;
 
@@ -570,19 +570,9 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		}
 	}
 
-
-	//cout << "view x" << vx << endl;
-	//cout << "view y" << vz << endl;
-	//cout << "view z" << vy << endl;	
-
-	//cout << "sphere x" << sphere_x<< endl;
-	//cout << "sphere y" << sphere_y<< endl;
-	//cout << "sphere z" << sphere_z<< endl;
-
-
-	cout << "light x" << light_x << endl;
-	cout << "light y" << light_y << endl;
-	cout << "light z" << light_z << endl;
+	//cout << "light x" << light_x << endl;
+	//cout << "light y" << light_y << endl;
+	//cout << "light z" << light_z << endl;
 	//cout << "rotation lift" << rotation_lift << endl;
 
 	if (key == ' ' && action != GLFW_PRESS)
