@@ -73,6 +73,8 @@ GLfloat rotation_lift;	//vertical rotation disk
 
 GLfloat disk_rotation_angle;
 
+GLfloat dial_rotation_angle;
+
 GLuint numspherevertices;
 
 /* Global instances of our objects */
@@ -84,6 +86,7 @@ Square aSquare;
 Cylinder bigCylinder(glm::vec3(0.0f, 0.0f, 0.0f));
 Cylinder smallCylinder(glm::vec3(1.0f, 0.0f, 0.0f));
 Cylinder tube(glm::vec3(1.0f, 1.0f, 1.0f));
+Cylinder dial(glm::vec3(0.66f, 0.66f, 0.66f));
 
 using namespace std;
 using namespace glm;
@@ -121,6 +124,7 @@ void init(GLWrapper* glw)
 	numlongs = 40;		// Number of longitudes in our sphere
 
 	disk_rotation_angle = 0.0;
+	dial_rotation_angle = 0.0;
 
 	// Generate index (name) for one vertex array object
 	glGenVertexArrays(1, &vao);
@@ -159,6 +163,7 @@ void init(GLWrapper* glw)
 	bigCylinder.makeCylinder(true);
 	smallCylinder.makeCylinder(false);
 	tube.makeCylinder(false);
+	dial.makeCylinder(true);
 }
 
 /* Called to update the display. Note that this function is called in the event loop in the wrapper
@@ -261,7 +266,9 @@ void display()
 	model.push(model.top());
 	{
 		// Define the model transformations for the square
-		model.top() = translate(model.top(), vec3(x-0.59f, y-0.59f, z + 0.14));
+		//model.top() = translate(model.top(), vec3(x - 0.59f, y - 0.59f, z + 0.14));
+		model.top() = translate(model.top(), vec3(x - 0.59f, y + 0.59f, z + 0.14));
+
 		model.top() = scale(model.top(), vec3(0.3, 0.3, 0.05));//scale equally in all axis
 		//model.top() = scale(model.top(), vec3(3*model_scale, 3*model_scale, model_scale/2));//scale equally in all axis
 
@@ -280,7 +287,10 @@ void display()
 	//sphere bulb
 	model.push(model.top());
 	{
-		model.top() = translate(model.top(), vec3(x - 0.59f, y + 0.59f, z + 0.14));
+		//model.top() = translate(model.top(), vec3(x - 0.59f, y + 0.59f, z + 0.14));
+		model.top() = translate(model.top(), vec3(x - 0.59f, y - 0.59f, z + 0.14));
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
+		model.top() = rotate(model.top(), radians(dial_rotation_angle), vec3(0, 1, 0));//scale equally in all axis
 		model.top() = scale(model.top(), vec3(0.1f, 0.1f, 0.1f)); // make a small sphere
 																	 // Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
@@ -289,7 +299,7 @@ void display()
 
 		/* Draw our lightposition sphere  with emit mode on*/
 		//glUniform1ui(emitmodeID, emitmode);
-		bulbSphere.drawSphere(drawmode);
+		dial.drawCylinder(drawmode);
 	}
 	model.pop();
 
@@ -529,7 +539,23 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '9') vy -= 1.f;
 	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
-	if (key == 'P') vz += 1.f;	
+	if (key == 'P') vz += 1.f;		
+	
+	//if (key == 'U') dial_rotation_angle -= 1.f;
+	//if (key == 'I') dial_rotation_angle += 1.f;
+
+	if (key == 'U') {
+		if (dial_rotation_angle <= 0 && dial_rotation_angle > -360) {
+			dial_rotation_angle -= 1.f;
+		}
+	}	
+	if (key == 'I') {
+		if (dial_rotation_angle < 0) {
+			dial_rotation_angle += 1.f;
+		}
+	}
+
+	cout << dial_rotation_angle << endl;
 
 	if (key == 'L') {
 		if (rotation_angle < 0) {
