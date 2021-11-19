@@ -58,12 +58,14 @@ void main()
 		float attenuation_k2 = 0.5;
 		float attenuation_k3 = 0.5;
 		attenuation = 1.0 / (attenuation_k1 + attenuation_k2 * distancetolight + attenuation_k3 * pow(distancetolight, 2));
+		diffuse = diffuse + (pow(attenuation, 2.5) * fspecularcolour)/2.5;
 	}
 
 	//If emitemode is enable, turn on emissive lighting
 	if (emitmode == 1) emissive = specular_colour[colourmode];
 
 	//Calculate output colour, based on the attenuation, diffuse and specular components
+	//outputColour = diffuse;
 	outputColour = attenuation * (diffuse + specular * 0.6) + emissive + global_ambient + fambientcolour;
 }
 

@@ -116,11 +116,11 @@ void init(GLWrapper* glw)
 	rotation_angle = 0.0f;
 	rotation_lift = 0.0f;
 	speed = 0.05f;
-	x = 0.05f;
+	x = 0;
 	y = 0;
 	z = 0;
-	vx = 0; vx = 0, vz = 4.f;
-	light_x = 0.1f; light_y = 0.45f; light_z = 0.65f;
+	vx = 0; vx = 0, vz = 0.f;
+	light_x = 0.5f; light_y = 0.05f; light_z = 0.95f;
 	angle_inc_x = angle_inc_y = angle_inc_z = 0;
 	model_scale = 1.f;
 	aspect_ratio = 1.3333f;
@@ -201,7 +201,7 @@ void display()
 
 	// Camera matrix
 	mat4 view = lookAt(
-		vec3(0, -3, 2), // Camera is at (0,0,4), in World Space
+		vec3(0, -3, 2.3), // Camera is at (0,0,4), in World Space
 		vec3(0, 0, 0), // and looks at the origin
 		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
@@ -534,8 +534,6 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	if (key == '6') light_z += speed;
 	if (key == '7') vx -= 1.f;
 	if (key == '8') vx += 1.f;
-	if (key == '9') vy -= 1.f;
-	if (key == '0') vy += 1.f;
 	if (key == 'O') vz -= 1.f;
 	if (key == 'P') vz += 1.f;
 
@@ -582,12 +580,12 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 	//cout << "sphere z" << sphere_z<< endl;
 
 
-	//cout << "light x" << light_x << endl;
-	//cout << "light y" << light_y << endl;
-	//cout << "light z" << light_z << endl;
+	cout << "light x" << light_x << endl;
+	cout << "light y" << light_y << endl;
+	cout << "light z" << light_z << endl;
 	//cout << "rotation lift" << rotation_lift << endl;
 
-	if (key == 'M' && action != GLFW_PRESS)
+	if (key == ' ' && action != GLFW_PRESS)
 	{
 		colourmode = colourmode++ % 4;
 		/*colourmode = !colourmode;
@@ -610,19 +608,18 @@ void displayControls() {
 
 	cout << "U, I-> Dial clockwise / anticlockwise\n" << endl;
 
-	cout << "7,8 -> Move scene on x axis;" << endl;
-	cout << "9,0 -> Move scene on y axis;" << endl;
-	cout << "O,P -> Move scene on z axis;\n" << endl;
-
 	cout << "1,2 -> Move light in X axis" << endl;
 	cout << "3,4 -> Move light in Y axis" << endl;
 	cout << "5,6 -> Move light in Z axis\n" << endl;
+
+	cout << "7,8 -> Move scene on x axis;" << endl;
+	cout << "O,P -> Move scene on z axis;\n" << endl;
 
 	cout << "Z, X -> Move object in X axis;" << endl;
 	cout << "C, V -> Move object in Y axis;" << endl;
 	cout << "B, N -> Move object in Z axis;\n" << endl;
 
-	cout << "M -> Colour mode" << endl;
+	cout << "SPACE -> Colour mode" << endl;
 	cout << ". -> Attenuation mode" << endl;
 }
 

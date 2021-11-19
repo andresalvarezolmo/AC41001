@@ -20,12 +20,17 @@ modify cube class to have a single colour x
 
 fix the lighting x
 
-organise controls 19 
- 
-comment code 19 
+organise controls 19 x
+
+finish point of view
+
+limit controls
+
+clean comment code 19 
 
 doc 19
 
+record video
 
 light x0.0999999
 light y0.45
@@ -45,18 +50,18 @@ A, D -> Move Left/Right stick
 
 U, I-> Dial clockwise / anticlockwise
 
-7,8 -> Move scene on x axis;
-9,0 -> Move scene on y axis;
-O,P -> Move scene on z axis;
+7,8 -> Move scene on x axis; LIMIT A LOT
+9,0 -> Move scene on y axis; XX
+O,P -> Move scene on z axis; LIMIT
 
-1,2 -> Move light in X axis
-3,4 -> Move light in Y axis
-5,6 -> Move light in Z axis
+1,2 -> Move light in X axis; LIMIT
+3,4 -> Move light in Y axis;
+5,6 -> Move light in Z axis;
 
 
-Z, X -> Move object in X axis;
+Z, X -> Move object in X axis; LIMIT
 C, V -> Move object in Y axis;
 B, N -> Move object in Z axis;
 
-M -> Colour mode
-. -> Attenuation mode
+SPACE -> Colour mode
+. -> Attenuation mode DELTE ATTENUATION CODEOOOOO
