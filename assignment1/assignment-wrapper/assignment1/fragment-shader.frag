@@ -1,5 +1,5 @@
-// Minimal fragment shader
-// Iain Martin 2018
+//Fragment Shader
+//Andres Alvarez Olmo
 
 #version 420 core
 
@@ -15,7 +15,7 @@ vec4 specular_colour[] = {
 vec4 global_ambient = vec4(0.05, 0.05, 0.05, 1.0);
 int shininess = 8;
 
-//Inputs from V shadercallcoherent
+//Inputs from vertex shader
 in vec3 fnormal, flightdir, fposition;
 in vec4 fdiffusecolour, fambientcolour;
 
@@ -46,30 +46,22 @@ void main()
 	vec4 specular = pow(max(dot(R,V), 0.0), shininess) * fspecularcolour;
 
 	//Calculate attenuation factor, 
-	//Turn off attenuation if attenuationmode is not set to true
 	float attenuation;
 
-		//Define attenuation constatns
-		float attenuation_k1 = 0.5;
-		float attenuation_k2 = 0.5;
-		float attenuation_k3 = 0.5;
-		attenuation = 1.0 / (attenuation_k1 + attenuation_k2 * distancetolight + attenuation_k3 * pow(distancetolight, 2));
-		
+	//Define attenuation constatns
+	float attenuation_k1 = 0.5;
+	float attenuation_k2 = 0.5;
+	float attenuation_k3 = 0.5;
 
+	//Calculate attenuation using different parameters to make it look more realistic
+	attenuation = 1.0 / (attenuation_k1 + attenuation_k2 * distancetolight + attenuation_k3 * pow(distancetolight, 2));
+
+	//calculate diffuse component based on the attenuation and the fspecularcolour with some tweaks to make it more realistic
 	diffuse = diffuse + (pow(attenuation, 2.5) * fspecularcolour)/2.5;
 
 	//If emitemode is enable, turn on emissive lighting
 	if (emitmode == 1) emissive = specular_colour[colourmode];
 
 	//Calculate output colour, based on the attenuation, diffuse and specular components
-	//outputColour = diffuse;
 	outputColour = attenuation * (diffuse + specular * 0.6) + emissive + global_ambient + fambientcolour;
 }
-
-//in vec4 fcolour;
-//out vec4 outputColor;
-//void main()
-//{
-//	outputColor = fcolour;
-//}
-

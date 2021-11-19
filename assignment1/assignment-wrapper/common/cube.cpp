@@ -1,17 +1,12 @@
 /* cube.h
- Example class to create a generic cube object
- Iain Martin October 2018
+ Class to create a generic cube object
+ Andres Alvarez Olmo 2021
 */
 
 #include "cube.h"
 
-/* I don't like using namespaces in header files but have less issues with them in
-seperate cpp files */
 using namespace std;
 
-/* Define the vertex attributes for vertex positions and normals.
-Make these match your application and vertex shader
-You might also want to add colours and texture coordinates */
 Cube::Cube()
 {
 	attribute_v_coord = 0;

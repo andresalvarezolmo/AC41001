@@ -1,10 +1,10 @@
 /*
- poslight.cpp
- Demonstrates a positional light with attenuation
- with per-vertex lighting (Gouraud shading) coded in the vertex shader.
- Displays a cube and a sphere and a small sphere to show the light position
- Includes controls to move the light source and rotate the view
- Iain Martin October 2018
+ assignment1.cpp
+ Demonstrates fragment lighting with attenuation 
+ with per-pixel lighting (Phong-shading) coded in the fragment shader
+ Displays a series of cylinders, squares, spheres and cubes that combined form a turntable
+ This class includes controls to move the light source, the point of view, the entire turntable, the dial and to change the colour of the light
+ Andres Alvarez Olmo 2021
 */
 
 /* Link to static libraries, could define these as linker inputs in the project settings instead
@@ -24,7 +24,7 @@ if you prefer */
 #include <iostream>
 #include <stack>
 
-   /* Include GLM core and matrix extensions*/
+/* Include GLM core and matrix extensions*/
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtc/type_ptr.hpp>
@@ -67,12 +67,13 @@ GLuint colourmodeID, emitmodeID;
 
 GLfloat aspect_ratio;		/* Aspect ratio of the window defined in the reshape callback*/
 
-GLfloat rotation_angle;	//lateral rotation disk
-GLfloat rotation_lift;	//vertical rotation disk	
+GLfloat rotation_angle;	//lateral rotation stick
+GLfloat rotation_lift;	//vertical rotation stick	
 
-GLfloat disk_rotation_angle;
+GLfloat disk_rotation_angle; //disk rotation angle 
 
-GLfloat dial_rotation_angle;
+GLfloat dial_rotation_angle; //dial rotaion angle
+
 
 GLuint numspherevertices;
 
@@ -91,10 +92,6 @@ using namespace std;
 using namespace glm;
 
 
-/*
-This function is called before entering the main rendering loop.
-Use it for all your initialisation stuff
-*/
 void init(GLWrapper* glw)
 {
 
@@ -124,9 +121,8 @@ void init(GLWrapper* glw)
 	model_scale = 1.f;
 	aspect_ratio = 1.3333f;
 	colourmode = 1; emitmode = 0;
-	numlats = 40;		// Number of latitudes in our sphere
-	numlongs = 40;		// Number of longitudes in our sphere
-
+	numlats = 40;
+	numlongs = 40;		
 	disk_rotation_angle = 0.0;
 	dial_rotation_angle = 0.0;
 
@@ -157,7 +153,7 @@ void init(GLWrapper* glw)
 	lightposID = glGetUniformLocation(program, "lightpos");
 	normalmatrixID = glGetUniformLocation(program, "normalmatrix");
 
-	/* create our sphere and cube objects */
+	/* create objects */
 	aSquare.makeSquare();
 	aSphere.makeSphere(numlats, numlongs, vec3(1.0, 1.0, 1.0));
 	bulbSphere.makeSphere(numlats, numlongs, vec3(1.0, 0.647, 0.0));
@@ -169,50 +165,39 @@ void init(GLWrapper* glw)
 	dial.makeCylinder(true);
 }
 
-/* Called to update the display. Note that this function is called in the event loop in the wrapper
-   class because we registered display as a callback function */
 void display()
 {
-	/* Define the background colour */
 	glClearColor(0.0f, 0.0f, 0.1f, 1.0f);
 
-	/* Clear the colour and frame buffers */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	/* Enable depth test  */
 	glEnable(GL_DEPTH_TEST);
 
-	/* Make the compiled shader program current */
 	glUseProgram(program);
 
-	// Define our model transformation in a stack and 
-	// push the identity matrix onto the stack
 	stack<mat4> model;
 	model.push(mat4(1.0f));
 
-	// Define the normal matrix
 	mat3 normalmatrix;
 
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	mat4 projection = perspective(radians(30.0f), aspect_ratio, 0.1f, 100.0f);
 
 	// Camera matrix
 	mat4 view = lookAt(
-		vec3(0, -3, 2.3), // Camera is at (0,0,4), in World Space
+		vec3(0, -3, 2.3), // Camera is at (0,-3,2.3), in World Space
 		vec3(0, 0, 0), // and looks at the origin
 		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 
-	// Apply rotations to the view position. This wil get appleid to the whole scene
-	view = rotate(view, -radians(vx), vec3(1, 0, 0)); //rotating in clockwise direction around x-axis
-	view = rotate(view, -radians(vy), vec3(0, 1, 0)); //rotating in clockwise direction around y-axis
+	// Apply rotations to the view position. This wil get appledd to the whole scene
+	view = rotate(view, -radians(vx), vec3(1, 0, 0));
+	view = rotate(view, -radians(vy), vec3(0, 1, 0));
 	view = rotate(view, -radians(vz), vec3(0, 0, 1));
 
 	// Define the light position and transform by the view matrix
 	vec4 lightpos = view * vec4(light_x, light_y, light_z, 1.0);
 
-	// Send our projection and view uniforms to the currently bound shader
-	// I do that here because they are the same for all objects
+
 	glUniform1ui(colourmodeID, colourmode);
 	glUniformMatrix4fv(viewID, 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(projectionID, 1, GL_FALSE, &projection[0][0]);
@@ -248,8 +233,7 @@ void display()
 	{
 		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x, y, z));
-		model.top() = scale(model.top(), vec3(3, 3, 0.5));//scale equally in all axis
-		//model.top() = scale(model.top(), vec3(3*model_scale, 3*model_scale, model_scale/2));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(3, 3, 0.5));
 
 		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
@@ -264,129 +248,105 @@ void display()
 	}
 	model.pop();
 
-	// This block of code draws the square
+	// This block of code draws the custom square
 	model.push(model.top());
 	{
-		// Define the model transformations for the square
-		//model.top() = translate(model.top(), vec3(x - 0.59f, y - 0.59f, z + 0.14));
 		model.top() = translate(model.top(), vec3(x - 0.59f, y + 0.59f, z + 0.14));
-
 		model.top() = scale(model.top(), vec3(0.3, 0.3, 0.05));//scale equally in all axis
-		//model.top() = scale(model.top(), vec3(3*model_scale, 3*model_scale, model_scale/2));//scale equally in all axis
 
-		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
-		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
 		aSquare.drawSquare(drawmode);
 	}
 	model.pop();
 
-	//sphere bulb
+	// This block of code draws the volume dial
 	model.push(model.top());
 	{
-		//model.top() = translate(model.top(), vec3(x - 0.59f, y + 0.59f, z + 0.14));
 		model.top() = translate(model.top(), vec3(x - 0.59f, y - 0.59f, z + 0.14));
-		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = rotate(model.top(), radians(dial_rotation_angle), vec3(0, 1, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.1f, 0.1f, 0.1f)); // make a small sphere
-																	 // Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));
+		model.top() = rotate(model.top(), radians(dial_rotation_angle), vec3(0, 1, 0));
+		model.top() = scale(model.top(), vec3(0.1f, 0.1f, 0.1f)); 
+
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our lightposition sphere  with emit mode on*/
-		//glUniform1ui(emitmodeID, emitmode);
 		dial.drawCylinder(drawmode);
 	}
 	model.pop();
 
-	// This block of code draws the bigger disk
+	// This block of code draws the bigger black disk
 	model.push(model.top());
-	{
-		// Define the model transformations for the cube
+	{		
 		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.15));
-		if (rotation_angle <= -17.5 && rotation_angle >= -40 && rotation_lift == 0) disk_rotation_angle -= 0.1;
-		model.top() = rotate(model.top(), radians(disk_rotation_angle), vec3(0, 0, 1));//scale equally in all axis
-		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.59f, 0.03f, 0.59f));//scale equally in all axis
-		//model.top() = scale(model.top(), vec3(model_scale/1.7, model_scale / 25, model_scale/1.7));//scale equally in all axis
 
-		// Send the model uniform and normal matrix to the currently bound shader,
+		//check if stick is on the right position, if it is rotate the disk
+		if (rotation_angle <= -17.5 && rotation_angle >= -40 && rotation_lift == 0) disk_rotation_angle -= 0.1;
+
+		model.top() = rotate(model.top(), radians(disk_rotation_angle), vec3(0, 0, 1));
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));
+		model.top() = scale(model.top(), vec3(0.59f, 0.03f, 0.59f));
+
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
-		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
+		/* Draw the big black disk*/
 		bigCylinder.drawCylinder(drawmode);
 	}
 	model.pop();
 
-	// This block of code draws the smaller disk
+	// This block of code draws the smaller red disk
 	model.push(model.top());
 	{
-		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x - 0.08f, y, z + 0.165f));
 		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
 		model.top() = scale(model.top(), vec3(0.2f, 0.022f, 0.2f));//scale equally in all axis
-		//model.top() = scale(model.top(), vec3(model_scale / 5, model_scale / 25, model_scale / 5));//scale equally in all axis
 
-		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
-		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
+		/* Draw our small red disj*/
 		smallCylinder.drawCylinder(drawmode);
 	}
 	model.pop();
 
-	// This block of code draws the tube cylinder of the disk
+	// This block of code draws the cylinder (tube shape) that support the disk
 	model.push(model.top());
 	{
-		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x - 0.08, y, z + 0.19));
-		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.02f, 0.06f, 0.02f));//scale equally in all axis
-		//model.top() = scale(model.top(), vec3(model_scale / 50, model_scale / 10, model_scale / 50));//scale equally in all axis
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));
+		model.top() = scale(model.top(), vec3(0.02f, 0.06f, 0.02f));
 
-		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
-		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
+		/* Draw the tube*/
 		tube.drawCylinder(drawmode);
 	}
 	model.pop();
 
-	// This block of code draws the tube cylinder of the disk
+	// This block of code draws the small central cylinder of the disk
 	model.push(model.top());
 	{
-		// Define the model transformations for the cube
 		model.top() = translate(model.top(), vec3(x + 0.6, y + 0.58, z + 0.16));
-		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));//scale equally in all axis
-		model.top() = scale(model.top(), vec3(0.04f, 0.3f, 0.04f));//scale equally in all axis
-		//model.top() = scale(model.top(), vec3(model_scale / 50, model_scale / 10, model_scale / 50));//scale equally in all axis
-
-		// Send the model uniform and normal matrix to the currently bound shader,
+		model.top() = rotate(model.top(), radians(90.0f), vec3(1, 0, 0));
+		model.top() = scale(model.top(), vec3(0.04f, 0.3f, 0.04f));
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
-		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
+		/* Draw the small center cylinder*/
 		tube.drawCylinder(drawmode);
 	}
 	model.pop();
@@ -394,107 +354,49 @@ void display()
 	// This block of code draws the stick
 	model.push(model.top());
 	{
-		// Define the model transformations for the cube
-		//model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.26f));
-		//model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.235f));
 		model.top() = translate(model.top(), vec3(x + 0.6f, y + 0.6f, z + 0.275f));
 
+		//Define stick rotation boundaries, if stick is on top of the disk then move it at the same pace as the track is rotation
 		if (rotation_angle <= -17.5 && rotation_angle >= -40 && rotation_lift == 0) rotation_angle -= 0.0025;
-		//if (rotation_angle <= -20 && rotation_lift == 0) rotation_angle -= 0.002;
 
-		//for stick rotation
+		//stick rotations, applied in inverse to match the mathematical restrictions
 		model.top() = rotate(model.top(), radians(rotation_angle), vec3(0, 0, 1));
-		//Rotate up and down
 		model.top() = rotate(model.top(), radians(rotation_lift), vec3(1, 0, 0));
 		model.top() = translate(model.top(), vec3(0, -0.6f, 0));
 
-		model.top() = scale(model.top(), vec3(0.125f, 2.2f, 0.1f));//scale equally in all axis
+		model.top() = scale(model.top(), vec3(0.125f, 2.2f, 0.1f));
 
-		// Send the model uniform and normal matrix to the currently bound shader,
 		glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 
-		// Recalculate the normal matrix and send to the vertex shader
 		normalmatrix = transpose(inverse(mat3(view * model.top())));
 		glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-		/* Draw our cube*/
+		/* Draw the stick*/
 		aCube.drawCube(drawmode);
 		model.push(model.top());
 		{
+			//Draw the sphere connected to the stick without popping the previous transformation so the ball is also rotated around the same axis as the stick
+
 			model.top() = translate(model.top(), vec3(0.6 - x, -0.51 - y, 0.22 - z));
 			model.top() = translate(model.top(), vec3(x - 0.6, y + 0.275, z - 0.7));
 
-			//model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y - 0.6, z + sphere_z));
 
-			model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
-			model.top() = scale(model.top(), vec3(1 / 0.125f, 1 / 2.2f, 1 / 0.1f));//scale equally in all axis
+			model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));
+			model.top() = scale(model.top(), vec3(1 / 0.125f, 1 / 2.2f, 1 / 0.1f));
 
-			//model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
-
-			// Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
 			glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
 			normalmatrix = transpose(inverse(mat3(view * model.top())));
 			glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
 
-			stickSphere.drawSphere(drawmode); // Draw our sphere
-
-		//	model.top() = translate(model.top(), vec3(x + 0.5f, y - 0.7, z+0.2));
-		//	model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y, z + sphere_z));
-		//	model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
-		//	model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
-
-		// //Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
-		//	glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
-		//	normalmatrix = transpose(inverse(mat3(view * model.top())));
-		//	glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
-
-		//aSphere.drawSphere(drawmode); // Draw our sphere
+			stickSphere.drawSphere(drawmode);
 		}
 		model.pop();
 	}
 	model.pop();
 
-	// This block of code draws the sphere
-	//model.push(model.top());
-	//{
-	//	model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y, z + sphere_z));
-	//	//for stick rotation
-	//	model.top() = rotate(model.top(), radians(rotation_angle), vec3(0, 0, 1));
-	//	//Rotate up and down
-	//	model.top() = rotate(model.top(), radians(rotation_lift), vec3(1, 0, 0));
-
-	//	//model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y - 0.6, z + sphere_z));
-
-	//	model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
-	//	//model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
-
-	//	// Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
-	//	glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
-	//	normalmatrix = transpose(inverse(mat3(view * model.top())));
-	//	glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
-
-	//	aSphere.drawSphere(drawmode); // Draw our sphere
-
-	////	model.top() = translate(model.top(), vec3(x + 0.5f, y - 0.7, z+0.2));
-	////	model.top() = translate(model.top(), vec3(x + sphere_x, y + sphere_y, z + sphere_z));
-	////	model.top() = scale(model.top(), vec3(1 / 25.f, 1 / 25.f, 1 / 25.f));//scale equally in all axis
-	////	model.top() = scale(model.top(), vec3(model_scale /20.f, model_scale / 20.f, model_scale / 20.f));//scale equally in all axis
-
-	//// //Recalculate the normal matrix and send the model and normal matrices to the vertex shader																							// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																								// Recalculate the normal matrix and send to the vertex shader																						// Recalculate the normal matrix and send to the vertex shader
-	////	glUniformMatrix4fv(modelID, 1, GL_FALSE, &(model.top()[0][0]));
-	////	normalmatrix = transpose(inverse(mat3(view * model.top())));
-	////	glUniformMatrix3fv(normalmatrixID, 1, GL_FALSE, &normalmatrix[0][0]);
-
-	////aSphere.drawSphere(drawmode); // Draw our sphere
-	//}
-	//model.pop();
-
-
-
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
 
-	/* Modify our animation variables */
 	angle_x += angle_inc_x;
 	angle_y += angle_inc_y;
 	angle_z += angle_inc_z;
@@ -510,8 +412,6 @@ static void reshape(GLFWwindow* window, int w, int h)
 /* change view angle, exit upon ESC */
 static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods)
 {
-	/* Enable this call if you want to disable key responses to a held down key*/
-	//if (action != GLFW_PRESS) return;
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -566,44 +466,41 @@ static void keyCallback(GLFWwindow* window, int key, int s, int action, int mods
 		}
 	}
 
-	//cout << "light x" << light_x << endl;
-	//cout << "light y" << light_y << endl;
-	//cout << "light z" << light_z << endl;
-	//cout << "rotation lift" << rotation_lift << endl;
-
 	if (key == ' ' && action != GLFW_PRESS)
 	{
 		colourmode = colourmode++ % 4;
-		/*colourmode = !colourmode;
-		cout << "colourmode=" << colourmode << endl;*/
-
 	}
 
 }
 
 void displayControls() {
 
-	cout << "CONTROLS \n" << endl;
-	cout << "W, S -> Lift/Lower stick" << endl;
-	cout << "A, D -> Move Left/Right stick\n" << endl;
+	cout << "OBSERVATIONS: \n" << endl;
+	cout << "\t- Place stick on top of the track so the song can start, once the \n\tstick reaches the end of the track, the disk will stop spinning\n" << endl;
+	cout << "\t- Controls are limited so objects can not too far from the scene\n" << endl;
 
-	cout << "U, I-> Dial clockwise / anticlockwise\n" << endl;
+	cout << "CONTROL KEYS: \n" << endl;
 
-	cout << "1,2 -> Move light in X axis" << endl;
-	cout << "3,4 -> Move light in Y axis" << endl;
-	cout << "5,6 -> Move light in Z axis\n" << endl;
+	cout << "\t- W, S -> Lift/Lower stick" << endl;
+	cout << "\t- A, D -> Rotate stick clockwise / anticlockwise\n" << endl;
 
-	cout << "7,8 -> Move scene on x axis;" << endl;
-	cout << "O,P -> Move scene on z axis;\n" << endl;
+	cout << "\t- U, I-> Rotate dial clockwise / anticlockwise\n" << endl;
 
-	cout << "Z, X -> Move object in X axis;" << endl;
-	cout << "C, V -> Move object in Y axis;" << endl;
-	cout << "B, N -> Move object in Z axis;\n" << endl;
+	cout << "\t- 1,2 -> Move light in X axis" << endl;
+	cout << "\t- 3,4 -> Move light in Y axis" << endl;
+	cout << "\t- 5,6 -> Move light in Z axis\n" << endl;
 
-	cout << "SPACE -> Colour mode" << endl;
+	cout << "\t- 7,8 -> Move scene on x axis;" << endl;
+	cout << "\t- O,P -> Move scene on z axis;\n" << endl;
+
+	cout << "\t- Z, X -> Move object in X axis;" << endl;
+	cout << "\t- C, V -> Move object in Y axis;" << endl;
+	cout << "\t- B, N -> Move object in Z axis;\n" << endl;
+
+	cout << "\t- SPACE -> Colour mode" << endl;
+	cout << "\t- ESC -> Terminate program" << endl;
 }
 
-/* Entry point of program */	
 int main(int argc, char* argv[])
 {
 	GLWrapper* glw = new GLWrapper(1024, 768, "Position light example");;
@@ -618,9 +515,6 @@ int main(int argc, char* argv[])
 	glw->setKeyCallback(keyCallback);
 	glw->setKeyCallback(keyCallback);
 	glw->setReshapeCallback(reshape);
-
-	/* Output the OpenGL vendor and version */
-	//glw->DisplayVersion();
 
 	displayControls();
 

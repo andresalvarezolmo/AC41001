@@ -1,13 +1,6 @@
 /**
 * Cylinder.h
-* Example of a cylinder. This was created by David Ogle in 2015 and updated and tidied up
-* by Iain Martin in November 2017.
-* Provided to the AC41001/AC51008 Graphics class to help debug their own cylinder objects or to
-* used in their assignment to provide another object to create models.
-*
-* The major limitation is that it is hard-coded to use 100 vertices in each rim. I would advise generalising
-* this in in functions defineVertices() and makeCylinder() so this will only work if it is defined with a 
-* definition of 100.
+* Andres Alvarez Olmo
 */
 
 #include "cylinder.h"
@@ -19,10 +12,6 @@ const float PI = 3.141592653589f;  /* pi */
 using namespace glm;
 using namespace std;
 
-
-/**
- * IM: Constrcutor with no parameters which creates a white cylinder
- */
 Cylinder::Cylinder () : Cylinder(vec3(1.f, 1.f, 1.f))
 {
 	
@@ -38,11 +27,8 @@ Cylinder::Cylinder(vec3 c) : colour(c)
 	attribute_v_colours = 1;
 	attribute_v_normal = 2;
 
-	// hard-coded number of vertices around the circle
-	// To change this value you will need to generalise the vertex number and offsets in
-	// functions defineVertices() and makeCylinder(). It has already been done in drawCylinder().
 	this->definition = 100;		
-	numberOfvertices = definition*4+2; //number of verticies in the cylinder
+	numberOfvertices = definition*4+2;
 }
 
 Cylinder::~Cylinder()
@@ -105,6 +91,8 @@ void Cylinder::makeCylinder(bool mixedCylinder)
 
 			vertices[i] = vec3(x, y, z);
 			normals[i] = vec3(0.0, 1.0, 0.0);
+
+			//Draw pixels with number 99 and 100 in red, all of the rest draw them black
 			mixedCylinder ? (i <= 99) ?  colour[i] = this->colour : colour[i] = vec3(1, 0, 0) : colour[i] = this->colour;
 			
 		}
@@ -134,7 +122,6 @@ void Cylinder::makeCylinder(bool mixedCylinder)
 			vertices[i] = vertices[top];
 			normals[i] = vec3(vertices[top].x, 0.0, vertices[top].z);
 			colour[i] = this->colour;
-			//colour[i] = vec3(abs(1-this->colour.x), abs(1 - this->colour.y), abs(1 - this->colour.z));
 			vertices[i + 1] = vertices[bottom];
 			normals[i + 1] = vec3(vertices[bottom].x, 0.0, vertices[bottom].z);
 			colour[i + 1] = this->colour;

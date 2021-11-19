@@ -1,6 +1,6 @@
-/* cube.h
-Example class to to show a cube implementation
-Iain Martin November 2018
+/* square.h
+Class to to show a square implementation
+Andres Alvarez Olmo
 */
 
 #pragma once
@@ -19,7 +19,7 @@ public:
 	void makeSquare();
 	void drawSquare(int drawmode);
 
-	// Define vertex buffer object names (e.g as globals)
+	// Define vertex buffer object names 
 	GLuint positionBufferObject;
 	GLuint colourObject;
 	GLuint normalsBufferObject;
